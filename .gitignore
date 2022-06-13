@@ -104,4 +104,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-codigo/dependencias
+codigo/parecer_tecnico/dependencias
