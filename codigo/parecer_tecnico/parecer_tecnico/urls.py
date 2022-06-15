@@ -29,5 +29,8 @@ urlpatterns = [
 
     # somente pra exemplo
     path("api/exemplos/", views.ExemploAPI.as_view(), name="exemplos"),
-    path("api/exemplos/<int:exemplo_id>", views.ExemploAPI.as_view(), name="exemplos_com_parametro")
+    path("api/exemplos/<int:exemplo_id>", views.ExemploAPI.as_view(), name="exemplos_com_parametro"),
+    
+    path("api/clientes/", views.ClienteAPI.as_view(), name="clientes"),
+    path("api/clientes/<int:cliente_id>", views.ClienteAPI.as_view(), name="clientes_com_parametro")
 ]

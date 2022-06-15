@@ -7,9 +7,11 @@ from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from api.serializers import UserSerializer, GroupSerializer, ExemploSerializer
-from api.selectors import ExemploSelector
-from api.services import ExemploService
+from api.serializers import UserSerializer, GroupSerializer, ExemploSerializer, ClienteSerializer
+from api.selectors import ExemploSelector, ClienteSelector
+from api.services import ExemploService, ClienteService
+
+from api.models import Cliente
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -59,6 +61,49 @@ class ExemploAPI(GenericAPIView):
             exemplo_serializer_salvo = ExemploSerializer(exemplo)
             
             return Response(exemplo_serializer_salvo.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            print(traceback.format_exc())
+            return Response({"msg": "ERROR_DATA_FORMAT"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            print(traceback.format_exc())
+            return Response({"msg": "INTERNAL_SERVER_ERROR"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def put(self, request, id, format=None):
+        pass
+
+    def delete(self, request, id):
+        pass
+    
+class ClienteAPI(GenericAPIView):
+    http_method_names = ['get', 'post', 'put', 'delete']
+    # permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, cliente_id=None):
+        selector = ClienteSelector()
+        cliente_serializer = None
+
+        if cliente_id is None:
+            clientes = selector.listar_todos()
+            cliente_serializer = ClienteSerializer(clientes, many=True)
+        else:
+            try:
+                cliente = selector.buscar_por_id(cliente_id)
+                cliente_serializer = ClienteSerializer(cliente)
+            except Cliente.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            
+        return Response(cliente_serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        try:
+            cliente_serializer = ClienteSerializer(data=request.data)
+            cliente_serializer.is_valid(raise_exception=True)
+            
+            cliente_service = ClienteService()
+            cliente = cliente_service.criar(cliente_serializer.validated_data)
+            cliente_serializer_salvo = ClienteSerializer(cliente)
+            
+            return Response(cliente_serializer_salvo.data, status=status.HTTP_201_CREATED)
         except serializers.ValidationError:
             print(traceback.format_exc())
             return Response({"msg": "ERROR_DATA_FORMAT"}, status=status.HTTP_400_BAD_REQUEST)
