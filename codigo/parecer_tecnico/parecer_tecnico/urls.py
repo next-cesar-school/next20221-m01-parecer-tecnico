@@ -26,5 +26,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
-]
 
+    # somente pra exemplo
+    path("api/exemplos/", views.ExemploAPI.as_view(), name="exemplos"),
+    path("api/exemplos/<int:exemplo_id>", views.ExemploAPI.as_view(), name="exemplos_com_parametro")
+]

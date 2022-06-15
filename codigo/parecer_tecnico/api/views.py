@@ -32,17 +32,20 @@ class ExemploAPI(GenericAPIView):
     http_method_names = ['get', 'post', 'put', 'delete']
     # permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, id=None):
+    def get(self, request, exemplo_id=None):
         selector = ExemploSelector()
-        exemplos = []
         exemplo_serializer = None
 
-        if id is None:
+        if exemplo_id is None:
             exemplos = selector.listar_todos()
             exemplo_serializer = ExemploSerializer(exemplos, many=True)
         else:
-            exemplos = selector.buscar_por_id(id)
-            exemplo_serializer = ExemploSerializer(exemplos)
+            exemplo = selector.buscar_por_id(exemplo_id)
+
+            if exemplo is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            exemplo_serializer = ExemploSerializer(exemplo)
 
         return Response(exemplo_serializer.data, status=status.HTTP_200_OK)
 
