@@ -54,3 +54,5 @@ class Cliente(models.Model):
     
 
 
+class Exemplo(models.Model):
+    pass

@@ -17,22 +17,14 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 from api import views
-from django.http import JsonResponse
-
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-def getRoutes(request):
-	return JsonResponse('Boa noite tudo bem....', safe=False)
-def getOi(request):
-    request.GET
-    return JsonResponse('Meu nome  Alexandre', safe=False)
 
 urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
-    path('Hello',getRoutes,name='routes'),
-    path('oi',getOi)
 ]
+
