@@ -1,0 +1,3 @@
+
+class ExemploService:
+    pass
