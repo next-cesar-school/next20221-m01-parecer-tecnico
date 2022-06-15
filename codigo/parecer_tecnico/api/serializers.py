@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from models import Exemplo
+from api.models import Exemplo
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
