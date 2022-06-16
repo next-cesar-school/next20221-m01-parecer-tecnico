@@ -7,11 +7,13 @@ from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from api.serializers import UserSerializer, GroupSerializer, ExemploSerializer, ClienteSerializer
-from api.selectors import ExemploSelector, ClienteSelector
-from api.services import ExemploService, ClienteService
+from api.serializers import UserSerializer, GroupSerializer, ExemploSerializer, ClienteSerializer, EquipamentoSerializer
+from api.selectors import ExemploSelector, ClienteSelector, EquipamentoSelector
+from api.services import ExemploService, ClienteService, EquipamentoService
 
-from api.models import Cliente
+from api.models import Cliente, Equipamento
+
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -138,3 +140,43 @@ class ClienteAPI(GenericAPIView):
         except:
             print("Cliente não encontrado.")
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class EquipamentoAPI(GenericAPIView):
+    http_method_names = ['get', 'post', 'put', 'delete']
+    
+    def get(self, request, equipamento_id=None):
+        selector = EquipamentoSelector()
+        equipamento_serializer = None
+        
+        if equipamento_id is None:
+            equipamentos = selector.listar_todos()
+            equipamento_serializer = EquipamentoSerializer(equipamentos, many=True)
+        else:
+            try:
+                equipamento = selector.buscar_por_id(equipamento_id)
+                equipamento_serializer = EquipamentoSerializer(equipamento)
+            except Equipamento.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            
+        return Response(equipamento_serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, format=None):
+        try:
+            equipamento_serializer = EquipamentoSerializer(data=request.data)
+            equipamento_serializer.is_valid(raise_exception=True)
+            
+            equipamento_service = EquipamentoService()
+            equipamento = equipamento_service.criar(equipamento_serializer.validated_data)
+            equipamento_serializer_salvo = EquipamentoSerializer(equipamento)
+            
+            return Response(equipamento_serializer_salvo.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            print(traceback.format_exc())
+            return Response({"msg": "ERROR_DATA_FORMAT"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            print(traceback.format_exc())
+            return Response({"msg": "INTERNAL_SERVER_ERROR"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+
+

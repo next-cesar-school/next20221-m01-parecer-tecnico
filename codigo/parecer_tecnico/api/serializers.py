@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from api.models import Exemplo, Cliente
+from api.models import Exemplo, Cliente, Equipamento
+
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -23,4 +24,9 @@ class ExemploSerializer(serializers.ModelSerializer):
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cliente
+        fields = '__all__'
+        
+class EquipamentoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Equipamento
         fields = '__all__'
