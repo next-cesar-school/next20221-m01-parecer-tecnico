@@ -33,4 +33,5 @@ urlpatterns = [
     
     path("api/clientes/", views.ClienteAPI.as_view(), name="clientes"),
     path("api/clientes/<int:cliente_id>", views.ClienteAPI.as_view(), name="clientes_com_parametro")
+    
 ]

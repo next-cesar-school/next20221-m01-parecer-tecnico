@@ -111,8 +111,30 @@ class ClienteAPI(GenericAPIView):
             print(traceback.format_exc())
             return Response({"msg": "INTERNAL_SERVER_ERROR"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def put(self, request, id, format=None):
-        pass
+    def put(self, request, cliente_id, format=None):
+        print(cliente_id)
+        print(request.data)
+        cliente_serializer = ClienteSerializer(data=request.data)
+        cliente_serializer.is_valid(raise_exception=True)
+        cliente = Cliente.objects.get(pk = cliente_id)
+        cliente.nomeCompleto = cliente_serializer.validated_data["nomeCompleto"]
+        cliente.documentoDeIdentificacao = cliente_serializer.validated_data["documentoDeIdentificacao"]
+        cliente.telefone = cliente_serializer.validated_data["telefone"]
+        cliente.email = cliente_serializer.validated_data["email"]
+        cliente.cep = cliente_serializer.validated_data["cep"]
+        cliente.rua = cliente_serializer.validated_data["rua"]
+        cliente.localidade = cliente_serializer.validated_data["localidade"]
+        cliente.cidade = cliente_serializer.validated_data["cidade"]
+        cliente.save()
+        cliente_serializer_atualizado = ClienteSerializer(cliente)
+        return Response(cliente_serializer_atualizado.data, status=status.HTTP_200_OK)
+        
 
-    def delete(self, request, id):
-        pass
+    def delete(self, request, cliente_id):
+        try:
+            cliente = Cliente.objects.get(pk = cliente_id)
+            cliente.delete()
+            print("Cliente removido.")
+        except:
+            print("Cliente não encontrado.")
+        return Response(status=status.HTTP_204_NO_CONTENT)
