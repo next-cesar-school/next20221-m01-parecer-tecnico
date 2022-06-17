@@ -176,14 +176,29 @@ class EquipamentoAPI(GenericAPIView):
         except Exception:
             print(traceback.format_exc())
             return Response({"msg": "INTERNAL_SERVER_ERROR"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, equipamentos_id, format=None):
+        print(equipamentos_id)
+        print(request.data)
+        equipamento_serializer = EquipamentoSerializer(data=request.data)
+        equipamento_serializer.is_valid(raise_exception=True)
+        equipamento = Equipamento.objects.get(pk = equipamentos_id)
+        equipamento.cliente = equipamento_serializer.validated_data["cliente"]
+        equipamento.tipoDeEquipamento = equipamento_serializer.validated_data["tipoDeEquipamento"]
+        equipamento.numeroDeSerie = equipamento_serializer.validated_data["numeroDeSerie"]
+        equipamento.fabricante = equipamento_serializer.validated_data["fabricante"]
+        equipamento.modelo = equipamento_serializer.validated_data["modelo"]
+        equipamento.save()
+        equipamento_serializer_atualizado = EquipamentoSerializer(equipamento)
+        return Response(equipamento_serializer_atualizado.data, status=status.HTTP_200_OK)
     
     def delete(self, request, equipamentos_id):
         try:
             equipamento = Equipamento.objects.get(pk = equipamentos_id)
             equipamento.delete()
-            print("Cliente removido.")
+            print("Equipamento removido.")
         except:
-            print("Cliente não encontrado.")
+            print("Equipamento não encontrado.")
         return Response(status=status.HTTP_204_NO_CONTENT)
         
         
