@@ -17,5 +17,5 @@ class EquipamentoService:
 class ParecerDoTecnicoService:
     def criar(self, validated_data):
         print(validated_data)
-        parecerdotecnico = ParecerDoTecnico.objects.create(**validated_data)
-        return parecerdotecnico
+        parecerdotecnicos = ParecerDoTecnico.objects.create(**validated_data)
+        return parecerdotecnicos

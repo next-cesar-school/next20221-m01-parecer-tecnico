@@ -8,15 +8,14 @@ from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from api.serializers import UserSerializer, GroupSerializer, ExemploSerializer, ClienteSerializer, EquipamentoSerializer, ParecerDoTecnico
-from api.selectors import ExemploSelector, ClienteSelector, EquipamentoSelector, ParecerDoTecnico
-from api.services import ExemploService, ClienteService, EquipamentoService, ParecerDoTecnico
+from api.serializers import UserSerializer, GroupSerializer, ExemploSerializer, ClienteSerializer, EquipamentoSerializer, ParecerDoTecnicoSerializer
+from api.selectors import ExemploSelector, ClienteSelector, EquipamentoSelector, ParecerDoTecnicoSelector
+from api.services import ExemploService, ClienteService, EquipamentoService, ParecerDoTecnicoService
 
 from api.models import Cliente, Equipamento, ParecerDoTecnico
-from selectors import ParecerDoTecnicoSelector
 
-from serializers import ParecerDoTecnicoSerializer
-from services import ParecerDoTecnicoService
+
+
 
 
 
@@ -215,30 +214,30 @@ class ParecerDoTecnicoAPI(GenericAPIView):
     
     def get(self, request, ParecerDoTecnicos_id=None):
         selector = ParecerDoTecnicoSelector()
-        equipamento_serializer = None
-        
+        parecerdotecnicos_serializer = None
+                
         if ParecerDoTecnicos_id is None:
             parecerdotecnicos = selector.listar_todos()
-            parecerdotecnicos_serializer = ParecerDoTecnicoSerializer()(parecerdotecnicos, many=True)
+            parecerdotecnicos_serializer = ParecerDoTecnicoSerializer(parecerdotecnicos, many=True)
         else:
             try:
-                parecerdotecnico= selector.buscar_por_id(parecerdotecnicos_id)
-                parecerdotecnico_serializer = ParecerDoTecnicoSerializer(parecerdotecnico)
+                parecerdotecnicos = selector.buscar_por_id(ParecerDoTecnicos_id)
+                parecerdotecnicos_serializer = ParecerDoTecnicoSerializer(parecerdotecnicos)
             except ParecerDoTecnico.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             
-        return Response(parecerdotecnico_serializer.data, status=status.HTTP_200_OK)
+        return Response(parecerdotecnicos_serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, format=None):
         try:
-            parecerdotecnico_serializer = ParecerDoTecnicoSerializer(data=request.data)
-            parecerdotecnico_serializer.is_valid(raise_exception=True)
+            parecerdotecnicos_serializer = ParecerDoTecnicoSerializer(data=request.data)
+            parecerdotecnicos_serializer.is_valid(raise_exception=True)
             
-            parecerdotecnico_service = ParecerDoTecnicoService()
-            parecerdotecnico = parecerdotecnico_service.criar(parecerdotecnico_serializer.validated_data)
-            parecerdotecnico_serializer_salvo = ParecerDoTecnicoSerializer(parecerdotecnico)
+            parecerdotecnicos_service = ParecerDoTecnicoService()
+            parecerdotecnicos = parecerdotecnicos_service.criar(parecerdotecnicos_serializer.validated_data)
+            parecerdotecnicos_serializer_salvo = ParecerDoTecnicoSerializer(parecerdotecnicos)
             
-            return Response(parecerdotecnico_serializer_salvo.data, status=status.HTTP_201_CREATED)
+            return Response(parecerdotecnicos_serializer_salvo.data, status=status.HTTP_201_CREATED)
         except serializers.ValidationError:
             print(traceback.format_exc())
             return Response({"msg": "ERROR_DATA_FORMAT"}, status=status.HTTP_400_BAD_REQUEST)
@@ -247,26 +246,24 @@ class ParecerDoTecnicoAPI(GenericAPIView):
             return Response({"msg": "INTERNAL_SERVER_ERROR"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def put(self, request, parecerdotecnicos_id, format=None):
-        
-        
         print(parecerdotecnicos_id)
         print(request.data)
-        parecerdotecnico_serializer = ParecerDoTecnicoSerializer(data=request.data)
-        parecerdotecnico_serializer.is_valid(raise_exception=True)
-        parecerdotecnico = ParecerDoTecnico.objects.get(pk = parecerdotecnicos_id)
+        parecerdotecnicos_serializer = ParecerDoTecnicoSerializer(data=request.data)
+        parecerdotecnicos_serializer.is_valid(raise_exception=True)
+        parecerdotecnicos = ParecerDoTecnico.objects.get(pk = parecerdotecnicos_id)
         
-        parecerdotecnico.defeitoRelatado = parecerdotecnico_serializer.validated_data["defeitoRelatado"]
-        parecerdotecnico.diagonosticoEfetuado = parecerdotecnico_serializer.validated_data["tdiagonosticoEfetuado"]
-        parecerdotecnico.tempoDeReparo = parecerdotecnico_serializer.validated_data["tempoDeReparo"]
-        parecerdotecnico.DataDoArquivo= parecerdotecnico_serializer.validated_data["DataDoArquivo"]
-        parecerdotecnico.save()
-        equipamento_serializer_atualizado = ParecerDoTecnicoSerializer(parecerdotecnico)
+        parecerdotecnicos.defeitoRelatado = parecerdotecnicos_serializer.validated_data["defeitoRelatado"]
+        parecerdotecnicos.diagonosticoEfetuado = parecerdotecnicos_serializer.validated_data["diagonosticoEfetuado"]
+        parecerdotecnicos.tempoDeReparo = parecerdotecnicos_serializer.validated_data["tempoDeReparo"]
+        parecerdotecnicos.DataDoArquivo= parecerdotecnicos_serializer.validated_data["DataDoArquivo"]
+        parecerdotecnicos.save()
+        equipamento_serializer_atualizado = ParecerDoTecnicoSerializer(parecerdotecnicos)
         return Response(equipamento_serializer_atualizado.data, status=status.HTTP_200_OK)
     
     def delete(self, request, parecerdotecnicos_id):
         try:
-            parecerdotecnico = ParecerDoTecnico.objects.get(pk = parecerdotecnicos_id)
-            parecerdotecnico.delete()
+            parecerdotecnicos = ParecerDoTecnico.objects.get(pk = parecerdotecnicos_id)
+            parecerdotecnicos.delete()
             print("Parecer removido.")
         except:
             print("Parecer não encontrado.")

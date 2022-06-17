@@ -38,6 +38,6 @@ urlpatterns = [
     path("api/equipamentos/<int:equipamentos_id>", views.EquipamentoAPI.as_view(), name="equipamentos_com_parametro"),
     
     path("api/parecerdotecnicos/", views.ParecerDoTecnicoAPI.as_view(), name="parecerdotecnicos"),
-    path("api/parecerdotecnicos/<int:parecerdotecnicos_id>", views.ParecerDoTecnicoAPI.as_view(), name="eparecerdotecnicos_com_parametro"),
+    path("api/parecerdotecnicos/<int:parecerdotecnicos_id>", views.ParecerDoTecnicoAPI.as_view(), name="parecerdotecnicos_com_parametro"),
     
 ]
