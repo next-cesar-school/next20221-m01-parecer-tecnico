@@ -1,5 +1,6 @@
 import traceback
 
+
 from django.shortcuts import render
 from django.contrib.auth.models import User, Group
 
@@ -7,11 +8,15 @@ from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from api.serializers import UserSerializer, GroupSerializer, ExemploSerializer, ClienteSerializer, EquipamentoSerializer
-from api.selectors import ExemploSelector, ClienteSelector, EquipamentoSelector
-from api.services import ExemploService, ClienteService, EquipamentoService
+from api.serializers import UserSerializer, GroupSerializer, ExemploSerializer, ClienteSerializer, EquipamentoSerializer, ParecerDoTecnico
+from api.selectors import ExemploSelector, ClienteSelector, EquipamentoSelector, ParecerDoTecnico
+from api.services import ExemploService, ClienteService, EquipamentoService, ParecerDoTecnico
 
-from api.models import Cliente, Equipamento
+from api.models import Cliente, Equipamento, ParecerDoTecnico
+from selectors import ParecerDoTecnicoSelector
+
+from serializers import ParecerDoTecnicoSerializer
+from services import ParecerDoTecnicoService
 
 
 
@@ -202,7 +207,10 @@ class EquipamentoAPI(GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
         
         
-class ParecerDoTecnico(GenericAPIView):
+        
+        
+        
+class ParecerDoTecnicoAPI(GenericAPIView):
     http_method_names = ['get', 'post', 'put', 'delete']
     
     def get(self, request, ParecerDoTecnicos_id=None):
@@ -211,11 +219,11 @@ class ParecerDoTecnico(GenericAPIView):
         
         if ParecerDoTecnicos_id is None:
             parecerdotecnicos = selector.listar_todos()
-            parecerdotecnicos_serializer = ParecerDoTecnicoSerializer(parecerdotecnicos, many=True)
+            parecerdotecnicos_serializer = ParecerDoTecnicoSerializer()(parecerdotecnicos, many=True)
         else:
             try:
                 parecerdotecnico= selector.buscar_por_id(parecerdotecnicos_id)
-                parecerdotecnicos_serializer = ParecerDoTecnicoSerializer(parecerdotecnico)
+                parecerdotecnico_serializer = ParecerDoTecnicoSerializer(parecerdotecnico)
             except ParecerDoTecnico.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             
@@ -228,7 +236,7 @@ class ParecerDoTecnico(GenericAPIView):
             
             parecerdotecnico_service = ParecerDoTecnicoService()
             parecerdotecnico = parecerdotecnico_service.criar(parecerdotecnico_serializer.validated_data)
-            parecerdotecnico_serializer_salvo = ParecerDoTecncioSerializer(parecerdotecnico)
+            parecerdotecnico_serializer_salvo = ParecerDoTecnicoSerializer(parecerdotecnico)
             
             return Response(parecerdotecnico_serializer_salvo.data, status=status.HTTP_201_CREATED)
         except serializers.ValidationError:
@@ -238,37 +246,28 @@ class ParecerDoTecnico(GenericAPIView):
             print(traceback.format_exc())
             return Response({"msg": "INTERNAL_SERVER_ERROR"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-    def put(self, request, parecerdotecnicoss_id, format=None):
-        
-         equipamento = models.ForeignKey("Equipamento", on_delete=models.CASCADE, related_name='parecerdotecnico') 
-    defeitoRelatado = models.CharField(max_length=50, null=False)
-    diagonosticoEfetuado = models.CharField(max_length=20, null=False)
-    tempoDeReparo = models.CharField(max_length=30, null=False)
-    DataDoArquivo = models.CharField(max_length=20, null=False)
-        
-        
+    def put(self, request, parecerdotecnicos_id, format=None):
         
         
         print(parecerdotecnicos_id)
         print(request.data)
-        parecerdotecnico_serializer = ParecerDoTecnciosSerializer(data=request.data)
+        parecerdotecnico_serializer = ParecerDoTecnicoSerializer(data=request.data)
         parecerdotecnico_serializer.is_valid(raise_exception=True)
         parecerdotecnico = ParecerDoTecnico.objects.get(pk = parecerdotecnicos_id)
         
-        parecerdotecnico.cliente = parecerdotecnico_serializer.validated_data["cliente"]
-        parecerdotecnico.tipoDeEquipamento = parecerdotecnico_serializer.validated_data["tipoDeEquipamento"]
-        parecerdotecnico.numeroDeSerie = parecerdotecnico_serializer.validated_data["numeroDeSerie"]
-        parecerdotecnico.fabricante = parecerdotecnico_serializer.validated_data["fabricante"]
-        parecerdotecnico.modelo = parecerdotecnico_serializer.validated_data["modelo"]
+        parecerdotecnico.defeitoRelatado = parecerdotecnico_serializer.validated_data["defeitoRelatado"]
+        parecerdotecnico.diagonosticoEfetuado = parecerdotecnico_serializer.validated_data["tdiagonosticoEfetuado"]
+        parecerdotecnico.tempoDeReparo = parecerdotecnico_serializer.validated_data["tempoDeReparo"]
+        parecerdotecnico.DataDoArquivo= parecerdotecnico_serializer.validated_data["DataDoArquivo"]
         parecerdotecnico.save()
         equipamento_serializer_atualizado = ParecerDoTecnicoSerializer(parecerdotecnico)
         return Response(equipamento_serializer_atualizado.data, status=status.HTTP_200_OK)
     
-    def delete(self, request, equipamentos_id):
+    def delete(self, request, parecerdotecnicos_id):
         try:
             parecerdotecnico = ParecerDoTecnico.objects.get(pk = parecerdotecnicos_id)
             parecerdotecnico.delete()
-            print("Equipamento removido.")
+            print("Parecer removido.")
         except:
-            print("Equipamento não encontrado.")
+            print("Parecer não encontrado.")
         return Response(status=status.HTTP_204_NO_CONTENT)

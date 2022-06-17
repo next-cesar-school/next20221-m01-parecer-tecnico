@@ -35,6 +35,9 @@ urlpatterns = [
     path("api/clientes/<int:cliente_id>", views.ClienteAPI.as_view(), name="clientes_com_parametro"),
     
     path("api/equipamentos/", views.EquipamentoAPI.as_view(), name="equipamentos"),
-    path("api/equipamentos/<int:equipamentos_id>", views.EquipamentoAPI.as_view(), name="equipamentos_com_parametro")
+    path("api/equipamentos/<int:equipamentos_id>", views.EquipamentoAPI.as_view(), name="equipamentos_com_parametro"),
+    
+    path("api/parecerdotecnicos/", views.ParecerDoTecnicoAPI.as_view(), name="parecerdotecnicos"),
+    path("api/parecerdotecnicos/<int:parecerdotecnicos_id>", views.ParecerDoTecnicoAPI.as_view(), name="eparecerdotecnicos_com_parametro"),
     
 ]
