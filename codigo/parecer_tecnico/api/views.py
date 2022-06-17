@@ -144,16 +144,16 @@ class ClienteAPI(GenericAPIView):
 class EquipamentoAPI(GenericAPIView):
     http_method_names = ['get', 'post', 'put', 'delete']
     
-    def get(self, request, equipamento_id=None):
+    def get(self, request, equipamentos_id=None):
         selector = EquipamentoSelector()
         equipamento_serializer = None
         
-        if equipamento_id is None:
+        if equipamentos_id is None:
             equipamentos = selector.listar_todos()
             equipamento_serializer = EquipamentoSerializer(equipamentos, many=True)
         else:
             try:
-                equipamento = selector.buscar_por_id(equipamento_id)
+                equipamento = selector.buscar_por_id(equipamentos_id)
                 equipamento_serializer = EquipamentoSerializer(equipamento)
             except Equipamento.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)

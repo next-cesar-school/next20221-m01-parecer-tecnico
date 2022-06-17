@@ -36,7 +36,7 @@ class Equipamento(models.Model):
     data_equipamento = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
-        return self.cliente.nome
+        return self.cliente.nomeCompleto
 
 
 
