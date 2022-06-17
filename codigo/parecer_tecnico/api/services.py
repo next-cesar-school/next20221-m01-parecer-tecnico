@@ -1,5 +1,4 @@
-from api.models import Cliente, Equipamento
-
+from api.models import Cliente, Equipamento, ParecerDoTecnico
 class ExemploService:
     pass
 
@@ -14,3 +13,9 @@ class EquipamentoService:
         print(validated_data)
         equipamento = Equipamento.objects.create(**validated_data)
         return equipamento
+    
+class ParecerDoTecnicoService:
+    def criar(self, validated_data):
+        print(validated_data)
+        parecerdotecnico = ParecerDoTecnico.objects.create(**validated_data)
+        return parecerdotecnico

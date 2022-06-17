@@ -202,5 +202,73 @@ class EquipamentoAPI(GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
         
         
-
-
+class ParecerDoTecnico(GenericAPIView):
+    http_method_names = ['get', 'post', 'put', 'delete']
+    
+    def get(self, request, ParecerDoTecnicos_id=None):
+        selector = ParecerDoTecnicoSelector()
+        equipamento_serializer = None
+        
+        if ParecerDoTecnicos_id is None:
+            parecerdotecnicos = selector.listar_todos()
+            parecerdotecnicos_serializer = ParecerDoTecnicoSerializer(parecerdotecnicos, many=True)
+        else:
+            try:
+                parecerdotecnico= selector.buscar_por_id(parecerdotecnicos_id)
+                parecerdotecnicos_serializer = ParecerDoTecnicoSerializer(parecerdotecnico)
+            except ParecerDoTecnico.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            
+        return Response(parecerdotecnico_serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, format=None):
+        try:
+            parecerdotecnico_serializer = ParecerDoTecnicoSerializer(data=request.data)
+            parecerdotecnico_serializer.is_valid(raise_exception=True)
+            
+            parecerdotecnico_service = ParecerDoTecnicoService()
+            parecerdotecnico = parecerdotecnico_service.criar(parecerdotecnico_serializer.validated_data)
+            parecerdotecnico_serializer_salvo = ParecerDoTecncioSerializer(parecerdotecnico)
+            
+            return Response(parecerdotecnico_serializer_salvo.data, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError:
+            print(traceback.format_exc())
+            return Response({"msg": "ERROR_DATA_FORMAT"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            print(traceback.format_exc())
+            return Response({"msg": "INTERNAL_SERVER_ERROR"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, parecerdotecnicoss_id, format=None):
+        
+         equipamento = models.ForeignKey("Equipamento", on_delete=models.CASCADE, related_name='parecerdotecnico') 
+    defeitoRelatado = models.CharField(max_length=50, null=False)
+    diagonosticoEfetuado = models.CharField(max_length=20, null=False)
+    tempoDeReparo = models.CharField(max_length=30, null=False)
+    DataDoArquivo = models.CharField(max_length=20, null=False)
+        
+        
+        
+        
+        print(parecerdotecnicos_id)
+        print(request.data)
+        parecerdotecnico_serializer = ParecerDoTecnciosSerializer(data=request.data)
+        parecerdotecnico_serializer.is_valid(raise_exception=True)
+        parecerdotecnico = ParecerDoTecnico.objects.get(pk = parecerdotecnicos_id)
+        
+        parecerdotecnico.cliente = parecerdotecnico_serializer.validated_data["cliente"]
+        parecerdotecnico.tipoDeEquipamento = parecerdotecnico_serializer.validated_data["tipoDeEquipamento"]
+        parecerdotecnico.numeroDeSerie = parecerdotecnico_serializer.validated_data["numeroDeSerie"]
+        parecerdotecnico.fabricante = parecerdotecnico_serializer.validated_data["fabricante"]
+        parecerdotecnico.modelo = parecerdotecnico_serializer.validated_data["modelo"]
+        parecerdotecnico.save()
+        equipamento_serializer_atualizado = ParecerDoTecnicoSerializer(parecerdotecnico)
+        return Response(equipamento_serializer_atualizado.data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, equipamentos_id):
+        try:
+            parecerdotecnico = ParecerDoTecnico.objects.get(pk = parecerdotecnicos_id)
+            parecerdotecnico.delete()
+            print("Equipamento removido.")
+        except:
+            print("Equipamento não encontrado.")
+        return Response(status=status.HTTP_204_NO_CONTENT)

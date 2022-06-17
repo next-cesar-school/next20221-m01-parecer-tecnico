@@ -14,7 +14,7 @@ class ParecerDoTecnico(models.Model):
     DataDoArquivo = models.CharField(max_length=20, null=False)
     
     def __str__(self):
-        return self.equipamento.nome
+        return self.equipamento.modelo
 
 
 
