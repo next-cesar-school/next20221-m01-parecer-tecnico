@@ -176,6 +176,15 @@ class EquipamentoAPI(GenericAPIView):
         except Exception:
             print(traceback.format_exc())
             return Response({"msg": "INTERNAL_SERVER_ERROR"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def delete(self, request, equipamentos_id):
+        try:
+            equipamento = Equipamento.objects.get(pk = equipamentos_id)
+            equipamento.delete()
+            print("Cliente removido.")
+        except:
+            print("Cliente não encontrado.")
+        return Response(status=status.HTTP_204_NO_CONTENT)
         
         
 
